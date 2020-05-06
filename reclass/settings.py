@@ -20,6 +20,7 @@ class Settings(object):
         'allow_none_override': defaults.OPT_ALLOW_NONE_OVERRIDE,
         'automatic_parameters': defaults.AUTOMATIC_RECLASS_PARAMETERS,
         'class_mappings_match_path': defaults.CLASS_MAPPINGS_MATCH_PATH,
+        'scalar_parameters': defaults.SCALAR_RECLASS_PARAMETERS,
         'default_environment': defaults.DEFAULT_ENVIRONMENT,
         'delimiter': defaults.PARAMETER_INTERPOLATION_DELIMITER,
         'dict_key_override_prefix':
