@@ -25,6 +25,7 @@ from six import iteritems
 from reclass.settings import Settings
 from reclass.datatypes import Entity, Classes, Parameters, Exports
 from reclass.errors import MappingFormatError, ClassNameResolveError, ClassNotFound, InvQueryClassNameResolveError, InvQueryClassNotFound, InvQueryError, InterpolationError, ResolveError
+from reclass.values import NodeInventory
 from reclass.values.parser import Parser
 
 
@@ -172,6 +173,19 @@ class Core(object):
             return Parameters({}, self._settings, '')
 
     def _get_inventory(self, all_envs, environment, queries):
+        '''
+            Returns a dictionary of NodeInventory objects, one per matching node. Exports
+            which are required for the given queries (or all exports if the queries is None)
+            are rendered, remaining exports are left unrendered.
+
+            Args:
+              all_envs - if True match export values from nodes in any environment
+                         else if False match only for nodes in the same environment as the
+                         environment parameter
+              environment - node environment to match against if all_envs is False
+              queries - list of inventory queries to determine required export values
+                        or if None match all exports defined by a node
+        '''
         inventory = {}
         for nodename in self._storage.enumerate_nodes():
             try:
@@ -191,6 +205,7 @@ class Core(object):
                 except ClassNameResolveError as e:
                     raise InvQueryClassNameResolveError(e)
                 if queries is None:
+                    # This only happens if reclass is called with the --inventory option
                     try:
                         node.interpolate_exports()
                     except InterpolationError as e:
@@ -203,7 +218,7 @@ class Core(object):
                         except InterpolationError as e:
                             e.nodename = nodename
                             raise InvQueryError(q.contents, e, context=p, uri=q.uri)
-                inventory[nodename] = node.exports.as_dict()
+                inventory[nodename] = NodeInventory(node.exports.as_dict(), node_base.environment == environment)
         return inventory
 
     def _node_entity(self, nodename):
