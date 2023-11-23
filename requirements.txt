@@ -1,5 +1,4 @@
 pyparsing
 pyyaml
 six
-enum34
 ddt
